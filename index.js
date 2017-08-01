@@ -18,6 +18,16 @@ function initAutocomplete() {
   map.addListener("click", function(data) {
     var lat = data.latLng.lat();
     var lon = data.latLng.lng();
+    var App = ("onload" in new XMLHttpRequest()) ? XMLHttpRequest : XDomainRequest;
+    var app = new App();
+
+    app.open("GET", "http://api.openweathermap.org/data/2.5/weather?lat=" + lat + "&lon=" + lon + "&APPID=c626ca16133635679209d853c36c5ba3", false);
+
+    app.send();
+
+    var r = JSON.parse(app.response);
+    var generalInfo = "City:" + "<b>" + r.name + "</b>" + "</br>" + "Temperature: " + "<b>" + r.main.temp + "</b>" + "</br>" + "Humidity: " + "<b>" + r.main.humidity + "</b>";
+    document.getElementById("info").innerHTML = generalInfo;
   })
 
   var markers = [];
@@ -64,7 +74,6 @@ function initAutocomplete() {
 
       markers.addListener('click', function() {
         infowindow.open(map, markers);
-        console.log(foo(markers));
         var App = ("onload" in new XMLHttpRequest()) ? XMLHttpRequest : XDomainRequest;
         var app = new App();
 
@@ -73,10 +82,6 @@ function initAutocomplete() {
         app.onload = function() {
           console.log(this.responseText);
         }
-
-        // app.onerror = function() {
-        //   alert( "erroooorrr" );
-        // }
 
         app.send();
 
@@ -94,9 +99,4 @@ function initAutocomplete() {
     });
     map.fitBounds(bounds);
   });
-}
-
-
-function foo (s) {
-  return s
 }
