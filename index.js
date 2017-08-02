@@ -15,19 +15,23 @@ function initAutocomplete() {
     searchBox.setBounds(map.getBounds());
   });
 
-  map.addListener("click", function(data) {
-    var lat = data.latLng.lat();
-    var lon = data.latLng.lng();
+  function getWeather (name) {
     var App = ("onload" in new XMLHttpRequest()) ? XMLHttpRequest : XDomainRequest;
     var app = new App();
 
-    app.open("GET", "http://api.openweathermap.org/data/2.5/weather?lat=" + lat + "&lon=" + lon + "&APPID=c626ca16133635679209d853c36c5ba3", false);
-
+    app.open("GET", "http://api.openweathermap.org/data/2.5/weather?" + name +"&APPID=c626ca16133635679209d853c36c5ba3", false);
     app.send();
-
+    
     var r = JSON.parse(app.response);
     var generalInfo = "City:" + "<b>" + r.name + "</b>" + "</br>" + "Temperature: " + "<b>" + r.main.temp + "</b>" + "</br>" + "Humidity: " + "<b>" + r.main.humidity + "</b>";
-    document.getElementById("info").innerHTML = generalInfo;
+    document.getElementById("info").innerHTML = generalInfo
+  }
+
+  map.addListener("click", function(data) {
+    var lat = data.latLng.lat();
+    var lon = data.latLng.lng();
+    var name = "lat=" + lat + "&lon=" + lon;
+    getWeather(name)
   })
 
   var markers = [];
@@ -74,21 +78,8 @@ function initAutocomplete() {
 
       markers.addListener('click', function() {
         infowindow.open(map, markers);
-        var App = ("onload" in new XMLHttpRequest()) ? XMLHttpRequest : XDomainRequest;
-        var app = new App();
-
-        app.open("GET", "http://api.openweathermap.org/data/2.5/weather?q="+markers.title+"&APPID=c626ca16133635679209d853c36c5ba3", false);
-
-        app.onload = function() {
-          console.log(this.responseText);
-        }
-
-        app.send();
-
-        var r = JSON.parse(app.response);
-        var generalInfo = "City:" + "<b>" + r.name + "</b>" + "</br>" + "Temperature: " + "<b>" + r.main.temp + "</b>" + "</br>" + "Humidity: " + "<b>" + r.main.humidity + "</b>";
-        document.getElementById("info").innerHTML = generalInfo;
-
+        var name = "q=" + markers.title;
+        getWeather(name);
       });
 
       if (place.geometry.viewport) {
